@@ -16,4 +16,4 @@
 #
 
 PRODUCT_MAKEFILES := \
-    $(LOCAL_DIR)/full_omap34com.mk
+    $(LOCAL_DIR)/omap3.mk

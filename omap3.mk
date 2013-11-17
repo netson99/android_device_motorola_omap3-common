@@ -15,38 +15,23 @@
 # limitations under the License.
 #
 
-# This file includes all definitions that apply to ALL omap34com devices, and
-# are also specific to omap34com devices
+# This file includes all definitions that apply to ALL omap3 devices, and
+# are also specific to omap3 devices
 #
 # Everything in this directory will become public
 
-DEVICE_PREBUILT := device/motorola/omap34com/prebuilt
-DEVICE_PACKAGE_OVERLAYS := device/motorola/omap34com/overlay
+DEVICE_PREBUILT := device/motorola/omap3-common/prebuilt
+DEVICE_PACKAGE_OVERLAYS := device/motorola/omap3-common/overlay
 
-# This device is xhdpi.  However the platform doesn't
-# currently contain all of the bitmaps at xhdpi density so
-# we do this little trick to fall back to the hdpi version
-# if the xhdpi doesn't exist.
-PRODUCT_AAPT_CONFIG := normal hdpi
-PRODUCT_AAPT_PREF_CONFIG := hdpi
-
-# Camera
+# Camerahal
 PRODUCT_PACKAGES := \
-	Camera camera.omap3 libcamera \
-	hwcomposer.default libui
-
-# Modem
-PRODUCT_PACKAGES += \
-	rild \
-	libril \
-	libreference-ril \
-	libreference-cdma-sms \
-	radiooptions
+	camera.omap3
 
 # ICS graphics
 PRODUCT_PACKAGES += \
-	libEGL libGLESv2 libGLESv1_CM \
-	libdsswbhal ti_wfd_libs
+	hwcomposer.default \
+#ti_wfd_libs
+
 ifeq ($(TARGET_USES_ION),true)
 PRODUCT_PACKAGES += libion
 endif
@@ -57,7 +42,8 @@ PRODUCT_PACKAGES += \
 
 # DSP
 PRODUCT_PACKAGES += \
-	cexec.out libbridge
+	cexec.out \
+	libbridge
 
 # OMX
 PRODUCT_PACKAGES += \
@@ -77,6 +63,10 @@ PRODUCT_PACKAGES += \
 	libOMX.TI.ILBC.decode \
 	libOMX.TI.ILBC.encode \
 	libOMX.TI.VPP \
+	libVendor_ti_omx \
+	01_Vendor_ti_omx.cfg \
+	libVendor_ti_omx_config_parser \
+	
 #	libLCML
 
 # Wifi
@@ -92,11 +82,16 @@ PRODUCT_COPY_FILES += \
 
 # Core
 PRODUCT_PACKAGES += \
-	mot_boot_mode charge_only_mode \
-	lights.omap3 usbd ping6
+	mot_boot_mode \
+	charge_only_mode \
+	usbd
 
 # Apps and bin
-PRODUCT_PACKAGES += Superuser su FileManager Torch Usb Apollo GanOptimizer
+PRODUCT_PACKAGES += \
+	Torch \
+	Usb \
+	GanOptimizer \
+	GlobalNwSwitch
 
 # Live Wallpapers
 PRODUCT_PACKAGES += \
@@ -119,6 +114,13 @@ PRODUCT_COPY_FILES := \
 	$(DEVICE_PREBUILT)/usr/keychars/cpcap-key.kcm:system/usr/keychars/cpcap-key.kcm \
 	$(DEVICE_PREBUILT)/usr/keychars/qtouch-touchscreen.kcm:system/usr/keychars/qtouch-touchscreen.kcm \
 	$(DEVICE_PREBUILT)/usr/keychars/sholes-keypad.kcm:system/usr/keychars/sholes-keypad.kcm
+
+# apns
+PRODUCT_COPY_FILES := \
+	$(DEVICE_PREBUILT)/etc/apns-conf.xml:/system/etc/apns-conf.xml
+
+# gps
+$(call inherit-product, device/common/gps/gps_us.mk)
 
 # DSP
 PRODUCT_COPY_FILES += \
@@ -153,7 +155,6 @@ PRODUCT_COPY_FILES += \
 	$(DEVICE_PREBUILT)/etc/apns-conf.xml:system/etc/apns-conf.xml \
 	$(DEVICE_PREBUILT)/etc/egl.cfg:system/etc/egl.cfg \
 	$(DEVICE_PREBUILT)/etc/inetd.conf:system/etc/inetd.conf \
-	$(DEVICE_PREBUILT)/etc/gps.conf:system/etc/gps.conf \
 	$(DEVICE_PREBUILT)/etc/media_profiles.xml:system/etc/media_profiles.xml \
 	$(DEVICE_PREBUILT)/etc/profile:system/etc/profile \
 	$(DEVICE_PREBUILT)/etc/vold.fstab:system/etc/vold.fstab \
@@ -181,10 +182,10 @@ PRODUCT_COPY_FILES += \
 
 # these need to be here for the installer, just put them here for now
 PRODUCT_COPY_FILES += \
-	device/motorola/omap34com/releaseutils/mke2fs:system/bin/mke2fs \
-	device/motorola/omap34com/releaseutils/tune2fs:system/bin/tune2fs \
-	device/motorola/omap34com/releaseutils/check_kernel:system/etc/releaseutils/check_kernel \
-	device/motorola/omap34com/releaseutils/finalize_release:system/etc/finalize_release
+	device/motorola/omap3-common/releaseutils/mke2fs:system/bin/mke2fs \
+	device/motorola/omap3-common/releaseutils/tune2fs:system/bin/tune2fs \
+	device/motorola/omap3-common/releaseutils/check_kernel:system/etc/releaseutils/check_kernel \
+	device/motorola/omap3-common/releaseutils/finalize_release:system/etc/finalize_release
 
 # Hijack files
 PRODUCT_COPY_FILES += \
@@ -193,7 +194,7 @@ PRODUCT_COPY_FILES += \
 
 # Copy all common kernel modules
 PRODUCT_COPY_FILES += $(shell \
-	find device/motorola/omap34com/modules -name '*.ko' \
+	find device/motorola/omap3-common/modules -name '*.ko' \
 	| sed -r 's/^\/?(.*\/)([^/ ]+)$$/\1\2:system\/lib\/modules\/\2/' \
 	| tr '\n' ' ')
 
@@ -221,10 +222,6 @@ PRODUCT_PROPERTY_OVERRIDES += \
 	ro.vold.umsdirtyratio=20 \
 	ro.usb.use_custom_service=1 \
 	ro.kernel.android.checkjni=0 \
-	dalvik.vm.dexopt-flags=m=y,v=n,o=v,u=n \
-	dalvik.vm.execution-mode=int:jit \
-	dalvik.vm.heapstartsize=5m \
-	dalvik.vm.heapsize=128m \
 	dalvik.vm.checkjni=false \
 	dev.pm.dyn_samplingrate=1 \
 	debug.enabletr=false \
@@ -238,6 +235,10 @@ PRODUCT_PROPERTY_OVERRIDES += \
 	com.ti.omap_compat=1 \
 	com.ti.omap_enhancement=true
 
+# hdpi device
+PRODUCT_AAPT_CONFIG := normal hdpi
+PRODUCT_AAPT_PREF_CONFIG := hdpi
+
 # we have enough storage space to hold precise GC data
 PRODUCT_TAGS += dalvik.gc.type-precise
 
@@ -245,6 +246,6 @@ PRODUCT_TAGS += dalvik.gc.type-precise
 PRODUCT_LOCALES += en_US
 
 $(call inherit-product, hardware/ti/omap3/Android.mk)
-$(call inherit-product-if-exists, vendor/cm/config/common_full_phone.mk)
-$(call inherit-product-if-exists, vendor/motorola/omap34com/device-vendor.mk)
+$(call inherit-product, vendor/cm/config/common_full_phone.mk)
+$(call inherit-product-if-exists, vendor/motorola/omap3-common/device-vendor.mk)
 $(call inherit-product-if-exists, vendor/motorola/ti_sgx_es5.x/sgx-vendor.mk)
