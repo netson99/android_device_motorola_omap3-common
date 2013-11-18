@@ -45,6 +45,11 @@ PRODUCT_PACKAGES += \
 	cexec.out \
 	libbridge
 
+# legacy version of skia
+# fixes the app switcher previews
+PRODUCT_PACKAGES += \
+    libskia_legacy
+
 # OMX
 PRODUCT_PACKAGES += \
         libLCML \
