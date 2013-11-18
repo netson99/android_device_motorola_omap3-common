@@ -66,8 +66,6 @@ PRODUCT_PACKAGES += \
 	libVendor_ti_omx \
 	01_Vendor_ti_omx.cfg \
 	libVendor_ti_omx_config_parser \
-	
-#	libLCML
 
 # Wifi
 PRODUCT_PACKAGES += \

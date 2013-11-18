@@ -22,9 +22,12 @@ USE_CAMERA_STUB := false
 # Use the non-open-source parts, if they're present
 -include vendor/motorola/omap3-common/BoardConfigVendor.mk
 
+TARGET_NO_RADIOIMAGE := true
+TARGET_NO_BOOTLOADER := true
+TARGET_NO_PREINSTALL := true
+
 # Processor
 TARGET_ARCH := arm
-TARGET_NO_BOOTLOADER := true
 TARGET_BOARD_PLATFORM := omap3
 TARGET_CPU_ABI := armeabi-v7a
 TARGET_CPU_ABI2 := armeabi
@@ -33,34 +36,33 @@ TARGET_CPU_VARIANT := cortex-a8
 TARGET_ARCH_VARIANT := armv7-a-neon
 TARGET_ARCH_VARIANT_CPU := cortex-a8
 TARGET_ARCH_VARIANT_FPU := neon
-TARGET_GLOBAL_CFLAGS += -mtune=cortex-a8
-TARGET_GLOBAL_CPPFLAGS += -mtune=cortex-a8
 ARCH_ARM_HAVE_TLS_REGISTER := false
 TARGET_USE_SCORPION_BIONIC_OPTIMIZATION := true
+COMMON_GLOBAL_CFLAGS += -DTARGET_OMAP3 -DOMAP_COMPAT -DBINDER_COMPAT -DUSES_AUDIO_LEGACY
+COMMON_GLOBAL_CFLAGS += -DNEEDS_VECTORIMPL_SYMBOLS
+TARGET_GLOBAL_CFLAGS += -mtune=cortex-a8 -mfpu=neon -mfloat-abi=softfp
+TARGET_GLOBAL_CPPFLAGS += -mtune=cortex-a8 -mfpu=neon -mfloat-abi=softfp
 
 # customize the malloced address to be 16-byte aligned
 BOARD_MALLOC_ALIGNMENT := 16
 
+# Conserve memory in the Dalvik heap
+# Details: https://github.com/CyanogenMod/android_dalvik/commit/15726c81059b74bf2352db29a3decfc4ea9c1428
+TARGET_ARCH_LOWMEM := true
+
 # Kernel
 BOARD_KERNEL_BASE := 0x10000000
 
-# OMAP
-OMAP_ENHANCEMENT := true
-ifdef OMAP_ENHANCEMENT
-COMMON_GLOBAL_CFLAGS += -DOMAP_ENHANCEMENT -DTARGET_OMAP3
-endif
-
 # Graphics
 BOARD_EGL_CFG := device/motorola/omap3-common/prebuilt/etc/egl.cfg
-COMMON_GLOBAL_CFLAGS += -DOMAP_COMPAT -DBINDER_COMPAT
-DEFAULT_FB_NUM := 0
-GL_OES_compressed_ETC1_RGB8_texture := true
-BOARD_USES_OVERLAY := true
-USE_OPENGL_RENDERER := true
-TARGET_USE_OMX_RECOVERY := true
-TARGET_USES_ION := false
+COMMON_GLOBAL_CFLAGS += -DSYSTEMUI_PBSIZE_HACK=1
+COMMON_GLOBAL_CFLAGS += -DWORKAROUND_BUG_10194508=1
+COMMON_GLOBAL_CFLAGS += -DHAS_CONTEXT_PRIORITY -DDONT_USE_FENCE_SYNC
+TARGET_DISABLE_TRIPLE_BUFFERING := true
+TARGET_RUNNING_WITHOUT_SYNC_FRAMEWORK := true
 
 # Recovery
+TARGET_USE_OMX_RECOVERY := true
 BOARD_HAS_LOCKED_BOOTLOADER := true
 BOARD_ALWAYS_INSECURE := true
 BOARD_HAS_LARGE_FILESYSTEM := true
@@ -95,6 +97,7 @@ BOARD_HOSTAPD_DRIVER_NAME   := wilink
 
 # Bluetooth
 BOARD_HAVE_BLUETOOTH := true
+TARGET_CUSTOM_BLUEDROID := ../../../device/motorola/omap3-common/bluedroid.c
 
 # Sensors
 ENABLE_SENSORS_COMPAT := true
@@ -102,24 +105,12 @@ ENABLE_SENSORS_COMPAT := true
 # Camera
 BOARD_OVERLAY_BASED_CAMERA_HAL := true
 
-# OMX
-OMX_JPEG := true
+# OMX Stuff
 HARDWARE_OMX := true
-OMX_VENDOR := ti
-OMX_VENDOR_INCLUDES := \
-   hardware/ti/omx/system/src/openmax_il/omx_core/inc \
-   hardware/ti/omx/image/src/openmax_il/jpeg_enc/inc
-OMX_VENDOR_WRAPPER := TI_OMX_Wrapper
-BOARD_OPENCORE_LIBRARIES := libOMX_Core
-BOARD_OPENCORE_FLAGS := -DHARDWARE_OMX=1
-BUILD_WITH_TI_AUDIO := 1
+TARGET_USE_OMX_RECOVERY := true
 TARGET_USE_OMAP_COMPAT  := true
-BUILD_PV_OMX_ONLY := true
-BUILD_WITHOUT_PV := false
-
-ifdef OMAP_ENHANCEMENT
-COMMON_GLOBAL_CFLAGS += -DOVERLAY_SUPPORT_USERPTR_BUF
-endif
+BUILD_WITH_TI_AUDIO := 1
+BUILD_PV_VIDEO_ENCODERS := 1
 
 # MOTOROLA
 USE_MOTOROLA_CODE := true
@@ -132,6 +123,11 @@ TARGET_CUSTOM_RELEASETOOL := device/motorola/omap3-common/releasetools/squisher
 TARGET_RELEASETOOL_OTA_FROM_TARGET_SCRIPT := device/motorola/omap3-common/releasetools/droid_ota_from_target_files
 TARGET_RELEASETOOL_IMG_FROM_TARGET_SCRIPT := device/motorola/omap3-common/releasetools/droid_img_from_target_files
 
+# adb root
+ADDITIONAL_DEFAULT_PROPERTIES += ro.adb.secure=0
+ADDITIONAL_DEFAULT_PROPERTIES += ro.secure=0
+ADDITIONAL_DEFAULT_PROPERTIES += ro.allow.mock.location=1
+
 # Misc.
 BOARD_FLASH_BLOCK_SIZE := 131072
 BOARD_NEEDS_CUTILS_LOG := true
@@ -143,4 +139,3 @@ BOARD_USE_CID_ROTATE_34 := true
 TARGET_BOOTANIMATION_PRELOAD := true
 TARGET_BOOTANIMATION_TEXTURE_CACHE := true
 ENABLE_WEBGL := true
-
