@@ -249,6 +249,6 @@ PRODUCT_TAGS += dalvik.gc.type-precise
 PRODUCT_LOCALES += en_US
 
 $(call inherit-product, hardware/ti/omap3/Android.mk)
-$(call inherit-product, vendor/cm/config/common_full_phone.mk)
+$(call inherit-product, vendor/slim/config/common_full_phone.mk)
 $(call inherit-product-if-exists, vendor/motorola/omap3-common/device-vendor.mk)
 $(call inherit-product-if-exists, vendor/motorola/ti_sgx_es5.x/sgx-vendor.mk)
